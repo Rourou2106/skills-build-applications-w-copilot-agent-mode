@@ -33,7 +33,10 @@ export default function Activities() {
   useEffect(() => {
     async function loadActivities() {
       try {
-        const response = await fetch(`${getApiBaseUrl()}/api/activities/`);
+        const apiUrl = import.meta.env.VITE_CODESPACE_NAME
+          ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/activities/`
+          : `${getApiBaseUrl()}/api/activities/`;
+        const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error('Unable to load activities');
         }
