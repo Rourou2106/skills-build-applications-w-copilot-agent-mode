@@ -1,6 +1,30 @@
 import { useEffect, useState } from 'react';
 import { getApiBaseUrl } from '../utils/api';
 
+function normalizeItems(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  if (payload && Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  if (payload && Array.isArray(payload.activities)) {
+    return payload.activities;
+  }
+
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+
+  return [];
+}
+
 export default function Activities() {
   const [activities, setActivities] = useState([]);
   const [error, setError] = useState('');
@@ -15,8 +39,7 @@ export default function Activities() {
         }
 
         const payload = await response.json();
-        const items = Array.isArray(payload) ? payload : payload.activities ?? payload.results ?? [];
-        setActivities(items);
+        setActivities(normalizeItems(payload));
       } catch (err) {
         setError(err.message || 'Unexpected error');
       } finally {

@@ -1,6 +1,30 @@
 import { useEffect, useState } from 'react';
 import { getApiBaseUrl } from '../utils/api';
 
+function normalizeItems(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  if (payload && Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  if (payload && Array.isArray(payload.teams)) {
+    return payload.teams;
+  }
+
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+
+  return [];
+}
+
 export default function Teams() {
   const [teams, setTeams] = useState([]);
   const [error, setError] = useState('');
@@ -15,8 +39,7 @@ export default function Teams() {
         }
 
         const payload = await response.json();
-        const items = Array.isArray(payload) ? payload : payload.teams ?? payload.results ?? [];
-        setTeams(items);
+        setTeams(normalizeItems(payload));
       } catch (err) {
         setError(err.message || 'Unexpected error');
       } finally {

@@ -1,6 +1,30 @@
 import { useEffect, useState } from 'react';
 import { getApiBaseUrl } from '../utils/api';
 
+function normalizeItems(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  if (payload && Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  if (payload && Array.isArray(payload.leaderboard)) {
+    return payload.leaderboard;
+  }
+
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+
+  return [];
+}
+
 export default function Leaderboard() {
   const [entries, setEntries] = useState([]);
   const [error, setError] = useState('');
@@ -15,8 +39,7 @@ export default function Leaderboard() {
         }
 
         const payload = await response.json();
-        const items = Array.isArray(payload) ? payload : payload.leaderboard ?? payload.results ?? [];
-        setEntries(items);
+        setEntries(normalizeItems(payload));
       } catch (err) {
         setError(err.message || 'Unexpected error');
       } finally {
